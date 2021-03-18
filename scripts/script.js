@@ -2,18 +2,30 @@
     const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     const label = document.querySelector('.label');
+    const inputs = document.querySelectorAll('input');
     const config = {
-        DotMinRad: 6,
-        DotMaxRad: 20,
+        // DotMinRad: 6,
+        // DotMaxRad: 20,
+        // massFactor: 0.002,
+        // deafColor: ` rgba(48, 253, 37, 0.9)`,
+        // pi: 2 * Math.PI,
+        // smooth: .65,
+        // sphereRad: 300,
+        // cursorDotRad: 25,
+        // mouseSize: 100,
+        // time: 1500,
+        // maxSize: 150,
+        DotMinRad: inputs[0].value,
+        DotMaxRad: inputs[1].value,
         massFactor: 0.002,
-        deafColor: ` rgba(48, 253, 37, 0.9)`,
+        deafColor: inputs[2].value,
         pi: 2 * Math.PI,
-        smooth: .65,
+        maxSize: inputs[3].value,
+        smooth: inputs[4].value,
         sphereRad: 300,
         cursorDotRad: 25,
         mouseSize: 100,
-        time: 1500,
-        maxSize: 150,
+        time: inputs[5].value,
     }
     let w, h, mouse;
     let dots;
@@ -48,7 +60,7 @@
 
                 if (j == 0) {
                     let alpha = config.mouseSize / dist;
-                    a.color = `rgba(48, 253, 37, ${alpha})`
+                    a.color = config.deafColor + `, ${alpha})`;
                     if (dist < config.mouseSize) { force = (dist - config.mouseSize) * b.mass } else {
 
                     }
@@ -107,18 +119,72 @@
     }
     init();
     loop();
+    function clear() {
+        init();
+    }
     function isDown() {
         mouse.down = !mouse.down;
     }
     function updateLabel() {
-        label.style.top = mouse.y + 'px';
-        label.style.left = mouse.x + 'px';
+        //label.style.top = mouse.y + 'px';
+        //label.style.left = mouse.x + 'px';
     }
     function setPos({ layerX, layerY }) {
         [mouse.x, mouse.y] = [layerX, layerY];
     }
     canvas.addEventListener('mousemove', setPos);
-    window.addEventListener('mousedown', isDown);
-    window.addEventListener('mouseup', isDown);
+    canvas.addEventListener('mousedown', isDown);
+    canvas.addEventListener('mouseup', isDown);
+    function getColor() {
+        var str = document.querySelector('#color').style.backgroundColor; //rgb(123,1234,1)
+        str = str.substring(3, str.length - 1);
+        var res = 'rgba(' + str;
+        config.deafColor = res;
+    }
+    let updateConfig = () => {
+        $(document).ready(function () {
 
+            $('.val').farbtastic('#color');
+            document.querySelector('.farbtastic').addEventListener('mouseup', function () {
+                var str = document.querySelector('#color').style.backgroundColor; //rgb(123,1234,1)
+                str = str.substring(4, str.length - 1);
+                var res = 'rgba(' + str;
+                config.deafColor = res;
+                document.querySelector('#color').value = res;
+                dots[0].color = config.deafColor
+            })
+        });
+
+
+        inputs.forEach(element => {
+            element.addEventListener('change', function () {
+                let type = this.getAttribute('data-type');
+                if (type == 'data-min_rad') {
+                    config.DotMinRad = element.value;
+                }
+                if (type == 'data-max_rad') {
+                    config.DotMaxRad = element.value;
+                }
+                if (type == 'data-color') {
+
+                }
+                if (type == 'data-smooth') {
+                    config.smooth = element.value;
+                }
+                if (type == 'data-living_time') {
+                    config.time = element.value;
+                }
+                if (type == 'data-size') {
+                    config.maxSize = element.value
+                }
+                clear();
+            })
+
+        });
+
+
+    }
+    updateConfig();
 })();
+
+
